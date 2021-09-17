@@ -1,6 +1,6 @@
 const inquirer = require("inquirer");
-const fs = require("fs");
-const generatePage = require("./src/page-template.js");
+const { writeFile, copyFile } = require("./utils/generate-site");
+const generatePage = require("./src/page-template");
 
 const promptProject = (portfolioData) => {
   if (!portfolioData.projects) {
@@ -115,10 +115,11 @@ const promptUser = () => {
       },
     },
     {
-      type: 'confirm',
-      name: 'confirmAbout',
-      message: 'Would you like to enter some information about yourself for an "About" section?',
-      default: true
+      type: "confirm",
+      name: "confirmAbout",
+      message:
+        'Would you like to enter some information about yourself for an "About" section?',
+      default: true,
     },
     {
       type: "input",
@@ -130,7 +131,7 @@ const promptUser = () => {
         } else {
           return false;
         }
-      }
+      },
     },
   ]);
 };
@@ -138,13 +139,18 @@ const promptUser = () => {
 promptUser()
   .then(promptProject)
   .then((portfolioData) => {
-    console.log(portfolioData);
+    return generatePage(portfolioData);
+  })
+  .then((pageHTML) => {
+    return writeFile(pageHTML);
+  })
+  .then((writeFileResponse) => {
+    console.log(writeFileResponse);
+    return copyFile();
+  })
+  .then((copyFileResponse) => {
+    console.log(copyFileResponse);
+  })
+  .catch((err) => {
+    console.log(err);
   });
-
-// const pageHTML = generatePage(name, github);
-
-// fs.writeFile("./index.html", pageHTML, err => {
-//   if (err) throw err;
-
-//   console.log("Portfolio complete! Check out index.html to see the output!");
-// });
